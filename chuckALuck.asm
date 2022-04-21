@@ -126,13 +126,23 @@ getUserInput:
 	# Funtion Description:
 	#		This routine gets the user input for wager amout and dice roll.
 	#		Will loop if dice roll is out of 1-6 range.
+	
+	loop3:
 	li $v0, 4
 	la $a0, input_prompt2
 	syscall
 	li $v0, 5
 	syscall
+	blt $v0, $zero,invalid_wager
+	bgt $v0, $s0, invalid_wager
 	move $t0, $v0
 	li $v0, 4
+	j loop2
+	invalid_wager:
+	li $v0, 4
+	la $a0, error_prompt2
+	syscall
+	j loop3
 	
 	loop2:
 	la $a0, input_prompt3
