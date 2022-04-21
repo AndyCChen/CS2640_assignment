@@ -10,6 +10,8 @@ result_prompt2: .asciiz "\nYou matched once.\n"
 result_prompt3: .asciiz "\nYou matched twice.\n"
 result_prompt4: .asciiz "\nYou matched thrice.\n"
 result_prompt5: .asciiz "\nYou did not match any.\n"
+end_game: .asciiz "Bye!\n"
+lose_game: .asciiz "Game Over! You lost all your money.\n"
 error_prompt1: .asciiz "Your bet must be between 1 and 6!\n "
 error_prompt2: .asciiz "Your wager must be between zero and the balance amount!\n"
 seed: .word 19462
@@ -49,11 +51,14 @@ main:
 	li $v0, 4
 	la $a0,input_prompt1
 	syscall
+	
+	# get initial seed value from user input
 	li $v0, 5
 	syscall
 	sw $v0, seed
 	
 	# jump to getUserInput routine
+	game_loop:
 	jal getUserInput
 	
 	# initialize loop counter to 3 and matching dice roll counter to 0
@@ -80,12 +85,13 @@ main:
 	
 	li $v0, 4		# print string syscall
 	
-	# skip wager multiplication if $t3 (dice roll matches) == zero
+	# skip wager multiplication if $t3 (dice roll matches) equals zero
 	beqz $t3, zeroMatch
 	mul $t0, $t0, $t3		# multiply wager amount by how many times dice roll matched user dice roll bet
 	mflo $t0
 	add $s0, $s0, $t0
 	
+	# branch to appropriate msg depending on how many dice rolls the user matches
 	beq $t3, 1, oneMatch
 	
 	beq $t3, 2, twoMatch
@@ -93,7 +99,7 @@ main:
 	beq $t3, 3, threeMatch
 	
 	zeroMatch: 
-	sub $s0, $s0, $t0
+	sub $s0, $s0, $t0		# deduct money from current wager balance
 	la $a0, result_prompt5
 	j printResult
 	
@@ -110,14 +116,24 @@ main:
 	j printResult
 	
 	printResult: syscall
+	
+	# print game over msg and terminate if balance is zero or less
+	ble $s0, $zero, gameOver
+	
+	# print current wager balance
 	li $v0, 4
 	la $a0, input_prompt4
 	syscall
 	li $v0, 1
 	la $a0, ($s0)
 	syscall
+	j game_loop		# loop back to continue playing the game again
 	
-	end: li $v0, 10
+	gameOver: 
+	li $v0, 4
+	la $a0, lose_game
+	syscall
+	li $v0, 10
 	syscall
 	
 getUserInput:
@@ -127,23 +143,36 @@ getUserInput:
 	#		This routine gets the user input for wager amout and dice roll.
 	#		Will loop if dice roll is out of 1-6 range.
 	
+	# loop for wager input and validation
 	loop3:
 	li $v0, 4
 	la $a0, input_prompt2
 	syscall
 	li $v0, 5
 	syscall
+	beqz $v0, exit		# if wager input is zero, jump to exit and terminate program
 	blt $v0, $zero,invalid_wager
 	bgt $v0, $s0, invalid_wager
 	move $t0, $v0
 	li $v0, 4
 	j loop2
+	
+	# game termination due to user choices
+	exit:
+	li $v0, 4
+	la $a0, end_game
+	syscall
+	li $v0, 10
+	syscall
+	
+	# print error msg for invalid input
 	invalid_wager:
 	li $v0, 4
 	la $a0, error_prompt2
 	syscall
 	j loop3
 	
+	# loop for dice bet input and validation
 	loop2:
 	la $a0, input_prompt3
 	syscall
@@ -153,6 +182,8 @@ getUserInput:
 	bgt $v0, $s2, invalid_bet
 	move $t1, $v0
 	jr $ra
+	
+	# print error msg for invalid input
 	invalid_bet:
 	li $v0, 4
 	la $a0, error_prompt1
