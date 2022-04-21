@@ -23,7 +23,6 @@ main:
 	#		$t2 = loop1 counter
 	#		$t3 = number of times random dice roll equals user dice roll bet
 	#		$t4 = hold random number that is returned from the rand routine
-	#		$t5 = hold value for which message to print
 	# 		$s0 = balance amount, initilized to 500
 	# 		$s1 = 1 min bet value
 	#	   $s2  = 6 max bet value
@@ -79,33 +78,35 @@ main:
 	addi $t2, $t2, -1
 	bnez $t2, loop1		# end loop
 	
+	li $v0, 4		# print string syscall
+	
 	# skip wager multiplication if $t3 (dice roll matches) == zero
 	beqz $t3, zeroMatch
 	mul $t0, $t0, $t3		# multiply wager amount by how many times dice roll matched user dice roll bet
 	mflo $t0
 	add $s0, $s0, $t0
 	
-	li $t5, 1
-	beq $t3, $t5, oneMatch
+	beq $t3, 1, oneMatch
 	
-	li $t5, 2
-	beq $t3, $t5, twoMatch
+	beq $t3, 2, twoMatch
 	
-	li $t5, 3
-	beq $t3, $t5, threeMatch
+	beq $t3, 3, threeMatch
 	
-	li $v0, 4		# print string syscall
-	
-	zeroMatch: sub $s0, $s0, $t0
+	zeroMatch: 
+	sub $s0, $s0, $t0
+	la $a0, result_prompt5
 	j printResult
 	
-	oneMatch: la $a0, result_prompt2
+	oneMatch: 
+	la $a0, result_prompt2
 	j printResult
 	
-	twoMatch: la $a0, result_prompt3
+	twoMatch: 
+	la $a0, result_prompt3
 	j printResult
 	
-	threeMatch: la $a0, result_prompt4
+	threeMatch: 
+	la $a0, result_prompt4
 	j printResult
 	
 	printResult: syscall
@@ -145,19 +146,19 @@ getUserInput:
 rand:
 	# Registers:
 	# 		$v0: return value of random number 1-6
-	# 		$t0: temporary value to store calculations
+	# 		$t6: temporary value to store calculations
 	lw $v0, seed
-	sll $t0, $v0, 13
-	xor $v0, $v0, $t0
-	srl $t0, $v0, 17
-	xor $v0, $v0, $t0
-	sll $t0, $v0, 5
-	xor $v0, $v0, $t0
+	sll $t6, $v0, 13
+	xor $v0, $v0, $t6
+	srl $t6, $v0, 17
+	xor $v0, $v0, $t6
+	sll $t6, $v0, 5
+	xor $v0, $v0, $t6
 	sw $v0, seed
 	andi $v0, $v0 0xFFFF
-	li $t0, 6
+	li $t6, 6
 	
-	div $v0, $t0
+	div $v0, $t6
 	mfhi $v0
 	add $v0, $v0, 1
 	jr $ra
