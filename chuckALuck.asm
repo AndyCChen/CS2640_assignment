@@ -110,6 +110,12 @@ main:
 	j printResult
 	
 	printResult: syscall
+	li $v0, 4
+	la $a0, input_prompt4
+	syscall
+	li $v0, 1
+	la $a0, ($s0)
+	syscall
 	
 	end: li $v0, 10
 	syscall
