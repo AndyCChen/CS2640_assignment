@@ -1,0 +1,47 @@
+Welcome to Chuck-a-luck.
+You currently have $500
+Enter a seed number: 202038
+
+Enter your wager amount: 200
+What number do you want to bet on (1-6)? 3
+
+I roll 3
+I roll 3
+I roll 5
+You matched twice.
+You currently have $900
+Enter your wager amount: 400
+What number do you want to bet on (1-6)? 6
+
+I roll 1
+I roll 4
+I roll 5
+You did not match any.
+You currently have $500
+Enter your wager amount: 400
+What number do you want to bet on (1-6)? 3
+
+I roll 2
+I roll 2
+I roll 5
+You did not match any.
+You currently have $100
+Enter your wager amount: 50
+What number do you want to bet on (1-6)? 3
+
+I roll 3
+I roll 5
+I roll 5
+You matched once.
+You currently have $150
+Enter your wager amount: 150
+What number do you want to bet on (1-6)? 3
+
+I roll 6
+I roll 4
+I roll 6
+You did not match any.
+Game Over! You lost all your money.
+
+-- program is finished running --
+

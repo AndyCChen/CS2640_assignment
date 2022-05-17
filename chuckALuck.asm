@@ -137,11 +137,13 @@ main:
 	syscall
 	
 getUserInput:
+	##########################################################################
 	# Registers:
 	# 		$t0 = wager amount, $t1 = dice number 
 	# Funtion Description:
 	#		This routine gets the user input for wager amout and dice roll.
 	#		Will loop if dice roll is out of 1-6 range.
+	##########################################################################
 	
 	# loop for wager input and validation
 	loop3:
@@ -191,9 +193,11 @@ getUserInput:
 	j loop2
 	
 rand:
+	####################################################
 	# Registers:
 	# 		$v0: return value of random number 1-6
 	# 		$t6: temporary value to store calculations
+	####################################################
 	lw $v0, seed
 	sll $t6, $v0, 13
 	xor $v0, $v0, $t6
